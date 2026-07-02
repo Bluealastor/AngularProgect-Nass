@@ -188,6 +188,8 @@ scene.add(new THREE.Mesh(geo, mat));
 
 let drag=false, prevX=0, prevY=0, rotX=0, rotY=0;
 const el = renderer.domElement;
+
+// ── Mouse (desktop) ──────────────────────────────────────────────────────────
 el.addEventListener('mousedown', e=>{drag=true;prevX=e.clientX;prevY=e.clientY;});
 el.addEventListener('mouseup', ()=>drag=false);
 el.addEventListener('mouseleave', ()=>drag=false);
@@ -200,6 +202,34 @@ el.addEventListener('mousemove', e=>{
 el.addEventListener('wheel', e=>{
   camera.fov=Math.max(30,Math.min(110,camera.fov+e.deltaY*0.05));
   camera.updateProjectionMatrix(); e.preventDefault();
+},{passive:false});
+
+// ── Touch (mobile) ───────────────────────────────────────────────────────────
+let pinchDist=0;
+el.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    drag=true; prevX=e.touches[0].clientX; prevY=e.touches[0].clientY;
+  } else if(e.touches.length===2){
+    drag=false;
+    pinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                         e.touches[0].clientY-e.touches[1].clientY);
+  }
+},{passive:false});
+el.addEventListener('touchend', ()=>drag=false,{passive:false});
+el.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  if(e.touches.length===1 && drag){
+    const dx=e.touches[0].clientX-prevX, dy=e.touches[0].clientY-prevY;
+    rotY+=dx*0.004; rotX+=dy*0.004;
+    rotX=Math.max(-Math.PI/2,Math.min(Math.PI/2,rotX));
+    prevX=e.touches[0].clientX; prevY=e.touches[0].clientY;
+  } else if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                       e.touches[0].clientY-e.touches[1].clientY);
+    camera.fov=Math.max(30,Math.min(110,camera.fov-(d-pinchDist)*0.1));
+    camera.updateProjectionMatrix(); pinchDist=d;
+  }
 },{passive:false});
 window.addEventListener('resize',()=>{
   camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
