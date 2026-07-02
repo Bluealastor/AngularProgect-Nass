@@ -1,0 +1,9 @@
+<div class="viewer-wrap">
+  <div class="bar">
+    <button (click)="back()">← Indietro</button>
+    <span class="name">{{ name }}</span>
+    <button (click)="flipLenses()" title="Inverti lenti">⇄</button>
+    <button (click)="resetView()" title="Reset vista">⟳</button>
+  </div>
+  <div class="iframe-container" #container></div>
+</div>

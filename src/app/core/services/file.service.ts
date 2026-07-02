@@ -1,0 +1,46 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { TokenService } from './token.service';
+
+export type FileType = 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'OTHER' | 'DIRECTORY';
+
+export interface FileItem {
+  fileName: string;
+  fullPath: string;
+  size: number;
+  lastModified: string;
+  fileType: FileType;
+  metadata?: Record<string, string>;
+}
+
+// Comunica con il file-service tramite api-gateway.
+// Il JWT viene aggiunto automaticamente dall'AuthInterceptor.
+@Injectable({ providedIn: 'root' })
+export class FileService {
+  private http   = inject(HttpClient);
+  private tokens = inject(TokenService);
+
+  private readonly base = `${environment.apiUrl}/api/files`;
+
+  // Lista il contenuto di una directory locale del NAS
+  list(path: string): Observable<FileItem[]> {
+    const params = new HttpParams().set('path', path);
+    return this.http.get<FileItem[]>(`${this.base}/local`, { params });
+  }
+
+  // URL diretto per streaming/preview (include ?token= per autenticazione browser)
+  previewUrl(path: string): string {
+    const token = this.tokens.getAccessToken();
+    const base  = `${this.base}/preview?path=${encodeURIComponent(path)}`;
+    return token ? `${base}&token=${token}` : base;
+  }
+
+  // URL per il download diretto
+  downloadUrl(path: string): string {
+    const token = this.tokens.getAccessToken();
+    const base  = `${this.base}/download?path=${encodeURIComponent(path)}`;
+    return token ? `${base}&token=${token}` : base;
+  }
+}

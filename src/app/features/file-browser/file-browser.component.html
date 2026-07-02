@@ -1,0 +1,47 @@
+<div class="browser">
+  <!-- Header -->
+  <header class="header">
+    <span class="logo">🖥️ NAS</span>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Percorso">
+      @for (crumb of breadcrumbs; track crumb.path; let last = $last) {
+        @if (!last) {
+          <button class="crumb" (click)="loadPath(crumb.path)">{{ crumb.label }}</button>
+          <span class="sep">/</span>
+        } @else {
+          <span class="crumb active">{{ crumb.label }}</span>
+        }
+      }
+    </nav>
+
+    <button class="logout-btn" (click)="logout()" title="Esci">↩ Esci</button>
+  </header>
+
+  <!-- Corpo -->
+  <main class="content">
+    @if (loading) {
+      <div class="center">
+        <div class="spinner"></div>
+        <p>Caricamento…</p>
+      </div>
+    } @else if (error) {
+      <div class="center error">{{ error }}</div>
+    } @else if (items.length === 0) {
+      <div class="center muted">Cartella vuota</div>
+    } @else {
+      <ul class="file-list">
+        @for (item of items; track item.fullPath) {
+          <li class="file-item" (click)="navigate(item)" tabindex="0"
+              (keydown.enter)="navigate(item)">
+            <span class="file-icon">{{ icon(item) }}</span>
+            <span class="file-name">{{ item.fileName }}</span>
+            @if (item.fileType !== 'DIRECTORY') {
+              <span class="file-size">{{ formatSize(item.size) }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </main>
+</div>

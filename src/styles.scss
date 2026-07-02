@@ -1,0 +1,42 @@
+/* Reset e variabili globali */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:        #0f0f0f;
+  --color-surface:   #1a1a1a;
+  --color-border:    #2e2e2e;
+  --color-primary:   #ff6b00;
+  --color-primary-h: #ff8c00;
+  --color-text:      #e8e8e8;
+  --color-text-muted:#888;
+  --color-error:     #f55;
+  --radius:          8px;
+  --transition:      0.18s ease;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+}
