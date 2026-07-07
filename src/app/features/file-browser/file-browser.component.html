@@ -1,9 +1,6 @@
 <div class="browser">
-  <!-- Header -->
+  <!-- Breadcrumb (logo e logout sono nella navbar globale) -->
   <header class="header">
-    <span class="logo">🖥️ NAS</span>
-
-    <!-- Breadcrumb -->
     <nav class="breadcrumb" aria-label="Percorso">
       @for (crumb of breadcrumbs; track crumb.path; let last = $last) {
         @if (!last) {
@@ -14,8 +11,6 @@
         }
       }
     </nav>
-
-    <button class="logout-btn" (click)="logout()" title="Esci">↩ Esci</button>
   </header>
 
   <!-- Corpo -->

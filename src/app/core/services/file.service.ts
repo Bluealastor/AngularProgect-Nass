@@ -43,4 +43,16 @@ export class FileService {
     const base  = `${this.base}/download?path=${encodeURIComponent(path)}`;
     return token ? `${base}&token=${token}` : base;
   }
+
+  // Legge il contenuto testuale di un file (per Monaco Editor)
+  getContent(path: string): Observable<{ content: string }> {
+    const params = new HttpParams().set('path', path);
+    return this.http.get<{ content: string }>(`${this.base}/content`, { params });
+  }
+
+  // Salva il contenuto testuale di un file (per Monaco Editor)
+  saveContent(path: string, content: string): Observable<void> {
+    const params = new HttpParams().set('path', path);
+    return this.http.put<void>(`${this.base}/content`, { content }, { params });
+  }
 }

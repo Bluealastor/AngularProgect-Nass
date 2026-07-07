@@ -5,7 +5,14 @@ import { FileService, FileItem } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NavStateService } from '../../core/services/nav-state.service';
 
-const EXT_360 = ['insv', 'lrv'];
+const EXT_360  = ['insv', 'lrv'];
+const EXT_TEXT = [
+  'txt', 'md', 'markdown', 'log',
+  'json', 'yaml', 'yml', 'xml', 'toml', 'ini', 'env', 'properties',
+  'ts', 'js', 'mjs', 'html', 'htm', 'css', 'scss', 'less',
+  'java', 'kt', 'py', 'go', 'rs', 'cpp', 'c', 'cs', 'php', 'rb',
+  'swift', 'sh', 'bash', 'sql', 'graphql', 'dockerfile',
+];
 
 @Component({
   selector: 'app-file-browser',
@@ -76,6 +83,10 @@ export class FileBrowserComponent implements OnInit {
       this.router.navigate(['/video360'], {
         queryParams: { path: item.fullPath, name: item.fileName },
       });
+    } else if (EXT_TEXT.includes(ext)) {
+      this.router.navigate(['/editor'], {
+        queryParams: { path: item.fullPath, name: item.fileName },
+      });
     } else if (item.fileType === 'VIDEO') {
       this.router.navigate(['/video'], {
         queryParams: { path: item.fullPath, name: item.fileName },
@@ -91,6 +102,7 @@ export class FileBrowserComponent implements OnInit {
     if (item.fileType === 'DIRECTORY') return '📁';
     const ext = item.fileName.split('.').pop()?.toLowerCase() ?? '';
     if (EXT_360.includes(ext))          return '🌐';
+    if (EXT_TEXT.includes(ext))         return '📝';
     if (item.fileType === 'VIDEO')      return '🎬';
     if (item.fileType === 'IMAGE')      return '🖼️';
     return '📄';
