@@ -26,6 +26,7 @@ export const routes: Routes = [
       },
       {
         path: 'files',
+        data: { section: 'files' },
         loadComponent: () =>
           import('./features/file-browser/file-browser.component').then(
             m => m.FileBrowserComponent
@@ -33,6 +34,7 @@ export const routes: Routes = [
       },
       {
         path: 'media',
+        data: { section: 'media' },
         loadComponent: () =>
           import('./features/file-browser/file-browser.component').then(
             m => m.FileBrowserComponent

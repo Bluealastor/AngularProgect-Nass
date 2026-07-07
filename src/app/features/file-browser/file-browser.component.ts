@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FileService, FileItem } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NavStateService } from '../../core/services/nav-state.service';
@@ -25,8 +25,10 @@ export class FileBrowserComponent implements OnInit {
   private fileSvc  = inject(FileService);
   private authSvc  = inject(AuthService);
   private router   = inject(Router);
+  private route    = inject(ActivatedRoute);
   private navState = inject(NavStateService);
 
+  section     = '';
   currentPath = '';
   items: FileItem[] = [];
   breadcrumbs: { label: string; path: string }[] = [];
@@ -34,8 +36,10 @@ export class FileBrowserComponent implements OnInit {
   error   = '';
 
   ngOnInit(): void {
-    // Ripristina l'ultima cartella aperta (es. dopo aver chiuso un video)
-    this.loadPath(this.navState.lastFolderPath);
+    // Legge la sezione dalla route data (es. "media", "files")
+    // e ripristina l'ultimo percorso visitato per quella sezione
+    this.section = this.route.snapshot.data['section'] ?? '';
+    this.loadPath(this.navState.getPath(this.section));
   }
 
   loadPath(path: string): void {
@@ -50,7 +54,7 @@ export class FileBrowserComponent implements OnInit {
           return a.fileName.localeCompare(b.fileName);
         });
         this.currentPath = path;
-        this.navState.lastFolderPath = path;
+        this.navState.setPath(this.section, path);
         this.buildBreadcrumbs(path);
         this.loading = false;
       },
@@ -63,7 +67,7 @@ export class FileBrowserComponent implements OnInit {
 
   private buildBreadcrumbs(path: string): void {
     const parts = path ? path.split('/') : [];
-    this.breadcrumbs = [{ label: 'Home', path: '' }];
+    this.breadcrumbs = [{ label: 'Home', path: this.section }];
     let cumulative = '';
     for (const part of parts) {
       cumulative = cumulative ? `${cumulative}/${part}` : part;
@@ -81,15 +85,15 @@ export class FileBrowserComponent implements OnInit {
 
     if (EXT_360.includes(ext)) {
       this.router.navigate(['/video360'], {
-        queryParams: { path: item.fullPath, name: item.fileName },
+        queryParams: { path: item.fullPath, name: item.fileName, section: this.section },
       });
     } else if (EXT_TEXT.includes(ext)) {
       this.router.navigate(['/editor'], {
-        queryParams: { path: item.fullPath, name: item.fileName },
+        queryParams: { path: item.fullPath, name: item.fileName, section: this.section },
       });
     } else if (item.fileType === 'VIDEO') {
       this.router.navigate(['/video'], {
-        queryParams: { path: item.fullPath, name: item.fileName },
+        queryParams: { path: item.fullPath, name: item.fileName, section: this.section },
       });
     } else if (item.fileType === 'IMAGE') {
       window.open(this.fileSvc.previewUrl(item.fullPath), '_blank');
