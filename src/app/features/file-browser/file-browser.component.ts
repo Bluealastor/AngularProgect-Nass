@@ -126,6 +126,20 @@ export class FileBrowserComponent implements OnInit {
     return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + units[i];
   }
 
+  deleteItem(item: FileItem, event: Event): void {
+    event.stopPropagation(); // evita di aprire il file mentre si clicca elimina
+    const tipo = item.fileType === 'DIRECTORY' ? 'cartella' : 'file';
+    const msg  = item.fileType === 'DIRECTORY'
+      ? `Eliminare la cartella "${item.fileName}" e tutto il suo contenuto?`
+      : `Eliminare il file "${item.fileName}"?`;
+    if (!confirm(msg)) return;
+
+    this.fileSvc.delete(item.fullPath).subscribe({
+      next: () => this.loadPath(this.currentPath),
+      error: () => alert(`Errore durante l'eliminazione del ${tipo}.`),
+    });
+  }
+
   openFilePicker(): void {
     this.fileInputRef.nativeElement.value = '';
     this.fileInputRef.nativeElement.click();

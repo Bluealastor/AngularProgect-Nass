@@ -56,6 +56,12 @@ export class FileService {
     return this.http.put<void>(`${this.base}/content`, { content }, { params });
   }
 
+  // Elimina un file o una cartella (con tutto il suo contenuto) sul NAS.
+  delete(path: string): Observable<void> {
+    const params = new HttpParams().set('path', path);
+    return this.http.delete<void>(`${this.base}/delete`, { params });
+  }
+
   // Carica un singolo file nella cartella corrente del NAS.
   // 'folder' è il percorso relativo della cartella di destinazione (es. "media/INSTA360X5").
   // reportProgress + observe:'events' permette di tracciare la percentuale di avanzamento.

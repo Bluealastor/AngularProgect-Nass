@@ -62,6 +62,8 @@
             @if (item.fileType !== 'DIRECTORY') {
               <span class="file-size">{{ formatSize(item.size) }}</span>
             }
+            <button class="delete-btn" title="Elimina"
+                    (click)="deleteItem(item, $event)">🗑</button>
           </li>
         }
       </ul>
