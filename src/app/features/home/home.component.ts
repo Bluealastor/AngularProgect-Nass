@@ -10,6 +10,14 @@ interface Section {
   accent?: string;
 }
 
+interface Service {
+  icon: string;
+  title: string;
+  description: string;
+  port: number;
+  accent?: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -24,14 +32,15 @@ interface Section {
         <p class="hero-sub">Il tuo server personale — file, media e altro, sempre a portata di mano.</p>
       </section>
 
-      <!-- Cards -->
+      <!-- Sezioni interne -->
+      <h2 class="section-label">Sezioni</h2>
       <section class="cards">
         @for (s of sections; track s.route) {
           @if (!s.soon) {
             <a class="card" [routerLink]="s.route" [style.--accent]="s.accent ?? 'var(--color-primary)'">
               <div class="card-icon">{{ s.icon }}</div>
               <div class="card-body">
-                <h2>{{ s.title }}</h2>
+                <h3>{{ s.title }}</h3>
                 <p>{{ s.description }}</p>
               </div>
               <span class="card-arrow">→</span>
@@ -40,11 +49,27 @@ interface Section {
             <div class="card soon" [style.--accent]="s.accent ?? 'var(--color-primary)'">
               <div class="card-icon">{{ s.icon }}</div>
               <div class="card-body">
-                <h2>{{ s.title }} <span class="badge">presto</span></h2>
+                <h3>{{ s.title }} <span class="badge">presto</span></h3>
                 <p>{{ s.description }}</p>
               </div>
             </div>
           }
+        }
+      </section>
+
+      <!-- Servizi esterni -->
+      <h2 class="section-label">Servizi</h2>
+      <section class="cards">
+        @for (sv of services; track sv.port) {
+          <a class="card" [href]="serviceUrl(sv.port)" target="_blank" rel="noopener"
+             [style.--accent]="sv.accent ?? 'var(--color-primary)'">
+            <div class="card-icon">{{ sv.icon }}</div>
+            <div class="card-body">
+              <h3>{{ sv.title }}</h3>
+              <p>{{ sv.description }}</p>
+            </div>
+            <span class="card-arrow ext">↗</span>
+          </a>
         }
       </section>
 
@@ -54,14 +79,14 @@ interface Section {
     .home {
       min-height: 100%;
       padding: 48px 24px 64px;
-      max-width: 860px;
+      max-width: 960px;
       margin: 0 auto;
     }
 
     /* ── Hero ─────────────────────────────────────────────── */
     .hero {
       text-align: center;
-      margin-bottom: 56px;
+      margin-bottom: 48px;
     }
     .hero-icon {
       font-size: 56px;
@@ -83,18 +108,29 @@ interface Section {
       line-height: 1.6;
     }
 
+    /* ── Label sezione ────────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-muted);
+      margin: 0 0 12px;
+    }
+
     /* ── Cards ────────────────────────────────────────────── */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 36px;
     }
 
     .card {
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 20px;
+      padding: 18px 20px;
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: 14px;
@@ -130,18 +166,19 @@ interface Section {
     }
 
     .card-icon {
-      font-size: 32px;
+      font-size: 30px;
       flex-shrink: 0;
-      width: 48px;
+      width: 44px;
       text-align: center;
     }
 
     .card-body {
       flex: 1;
-      h2 {
-        font-size: 15px;
+      min-width: 0;
+      h3 {
+        font-size: 14px;
         font-weight: 600;
-        margin: 0 0 4px;
+        margin: 0 0 3px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -150,17 +187,21 @@ interface Section {
         font-size: 12px;
         color: var(--color-text-muted);
         margin: 0;
-        line-height: 1.5;
+        line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
     .card-arrow {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--accent);
       opacity: 0;
       transform: translateX(-4px);
       transition: opacity 0.2s, transform 0.2s;
       flex-shrink: 0;
+      &.ext { transform: translate(-4px, 4px); }
     }
 
     .badge {
@@ -176,6 +217,7 @@ interface Section {
   `],
 })
 export class HomeComponent {
+
   sections: Section[] = [
     {
       icon: '🎬',
@@ -184,21 +226,57 @@ export class HomeComponent {
       route: '/media',
       accent: '#e040fb',
     },
-    // ── Aggiungi qui le sezioni future ──────────────────────────────────────
     {
       icon: '📁',
       title: 'File',
-      description: 'Naviga, apri e modifica i tuoi file sul NAS.',
+      description: 'Naviga, apri e modifica i tuoi file.',
       route: '/files',
       accent: '#ff6b00',
     },
     {
       icon: '⚙️',
       title: 'Impostazioni',
-      description: 'Utenti, connessioni e preferenze del NAS.',
+      description: 'Utenti, connessioni e preferenze.',
       route: '/settings',
       accent: '#42a5f5',
       soon: true,
     },
   ];
+
+  services: Service[] = [
+    {
+      icon: '🎞️',
+      title: 'Jellyfin',
+      description: 'Streaming film e serie TV.',
+      port: 8096,
+      accent: '#00a4dc',
+    },
+    {
+      icon: '🎬',
+      title: 'Radarr',
+      description: 'Gestione e download automatico film.',
+      port: 7878,
+      accent: '#ffc230',
+    },
+    {
+      icon: '📺',
+      title: 'Sonarr',
+      description: 'Gestione e download automatico serie.',
+      port: 8989,
+      accent: '#35c5f4',
+    },
+    {
+      icon: '⬇️',
+      title: 'qBittorrent',
+      description: 'Client torrent.',
+      port: 8090,
+      accent: '#4caf50',
+    },
+  ];
+
+  // Costruisce l'URL del servizio usando l'hostname corrente
+  // così funziona sia da LAN (192.168.1.177) che da Tailscale (athena)
+  serviceUrl(port: number): string {
+    return `${window.location.protocol}//${window.location.hostname}:${port}`;
+  }
 }
