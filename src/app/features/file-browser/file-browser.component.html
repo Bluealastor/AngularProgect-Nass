@@ -1,5 +1,9 @@
 <div class="browser">
-  <!-- Breadcrumb (logo e logout sono nella navbar globale) -->
+
+  <!-- Input file nascosto (più file supportati) -->
+  <input #fileInput type="file" multiple hidden (change)="onFilesSelected($event)">
+
+  <!-- Header: breadcrumb + pulsante upload -->
   <header class="header">
     <nav class="breadcrumb" aria-label="Percorso">
       @for (crumb of breadcrumbs; track crumb.path; let last = $last) {
@@ -11,7 +15,31 @@
         }
       }
     </nav>
+
+    <button class="upload-btn" (click)="openFilePicker()" [disabled]="uploading" title="Carica file in questa cartella">
+      ⬆ Carica
+    </button>
   </header>
+
+  <!-- Barra di progresso upload -->
+  @if (uploading && uploadQueue.length > 0) {
+    <div class="upload-panel">
+      @for (entry of uploadQueue; track entry.name) {
+        <div class="upload-item">
+          <span class="upload-name">{{ entry.name }}</span>
+          <div class="upload-bar-wrap">
+            <div class="upload-bar" [style.width.%]="entry.progress"
+                 [class.done]="entry.done" [class.err]="entry.error"></div>
+          </div>
+          <span class="upload-pct">
+            @if (entry.error) { ⚠ }
+            @else if (entry.done) { ✓ }
+            @else { {{ entry.progress }}% }
+          </span>
+        </div>
+      }
+    </div>
+  }
 
   <!-- Corpo -->
   <main class="content">

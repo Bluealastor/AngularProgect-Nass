@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenService } from './token.service';
@@ -54,5 +54,18 @@ export class FileService {
   saveContent(path: string, content: string): Observable<void> {
     const params = new HttpParams().set('path', path);
     return this.http.put<void>(`${this.base}/content`, { content }, { params });
+  }
+
+  // Carica un singolo file nella cartella corrente del NAS.
+  // 'folder' è il percorso relativo della cartella di destinazione (es. "media/INSTA360X5").
+  // reportProgress + observe:'events' permette di tracciare la percentuale di avanzamento.
+  uploadFile(file: File, folder: string): Observable<HttpEvent<string>> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    if (folder) form.append('folder', folder);
+    return this.http.post<string>(`${this.base}/upload`, form, {
+      reportProgress: true,
+      observe: 'events',
+    });
   }
 }

@@ -1,6 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpEventType } from '@angular/common/http';
 import { FileService, FileItem } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NavStateService } from '../../core/services/nav-state.service';
@@ -28,12 +29,18 @@ export class FileBrowserComponent implements OnInit {
   private route    = inject(ActivatedRoute);
   private navState = inject(NavStateService);
 
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
   section     = '';
   currentPath = '';
   items: FileItem[] = [];
   breadcrumbs: { label: string; path: string }[] = [];
   loading = false;
   error   = '';
+
+  // Stato upload
+  uploading   = false;
+  uploadQueue: { name: string; progress: number; done: boolean; error: boolean }[] = [];
 
   ngOnInit(): void {
     // Legge la sezione dalla route data (es. "media", "files")
@@ -117,6 +124,51 @@ export class FileBrowserComponent implements OnInit {
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + units[i];
+  }
+
+  openFilePicker(): void {
+    this.fileInputRef.nativeElement.value = '';
+    this.fileInputRef.nativeElement.click();
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const files = Array.from(input.files);
+    this.uploadQueue = files.map(f => ({ name: f.name, progress: 0, done: false, error: false }));
+    this.uploading = true;
+    this.uploadNext(files, 0);
+  }
+
+  private uploadNext(files: File[], index: number): void {
+    if (index >= files.length) {
+      // tutti completati — ricarica la cartella
+      setTimeout(() => {
+        this.uploading = false;
+        this.uploadQueue = [];
+        this.loadPath(this.currentPath);
+      }, 1200);
+      return;
+    }
+
+    const file = files[index];
+    const entry = this.uploadQueue[index];
+
+    this.fileSvc.uploadFile(file, this.currentPath).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          entry.progress = Math.round((event.loaded / event.total) * 100);
+        } else if (event.type === HttpEventType.Response) {
+          entry.progress = 100;
+          entry.done = true;
+          this.uploadNext(files, index + 1);
+        }
+      },
+      error: () => {
+        entry.error = true;
+        this.uploadNext(files, index + 1);
+      },
+    });
   }
 
   logout(): void {
