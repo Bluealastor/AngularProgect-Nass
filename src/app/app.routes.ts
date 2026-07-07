@@ -31,6 +31,13 @@ export const routes: Routes = [
             m => m.FileBrowserComponent
           ),
       },
+      {
+        path: 'media',
+        loadComponent: () =>
+          import('./features/file-browser/file-browser.component').then(
+            m => m.FileBrowserComponent
+          ),
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },

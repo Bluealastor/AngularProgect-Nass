@@ -178,18 +178,19 @@ interface Section {
 export class HomeComponent {
   sections: Section[] = [
     {
+      icon: '🎬',
+      title: 'Media',
+      description: 'Foto e video sul NAS.',
+      route: '/media',
+      accent: '#e040fb',
+    },
+    // ── Aggiungi qui le sezioni future ──────────────────────────────────────
+    {
       icon: '📁',
       title: 'File',
       description: 'Naviga, apri e modifica i tuoi file sul NAS.',
       route: '/files',
       accent: '#ff6b00',
-    },
-    {
-      icon: '🎬',
-      title: 'Media',
-      description: 'Foto e video organizzati in galleria.',
-      route: '/media',
-      accent: '#e040fb',
       soon: true,
     },
     {

@@ -160,8 +160,9 @@ export class NavbarComponent {
 
   navItems: NavItem[] = [
     { label: 'Home',         icon: '🏠', route: '/home' },
-    { label: 'File',         icon: '📁', route: '/files' },
-    { label: 'Media',        icon: '🎬', route: '/media', soon: true },
+    { label: 'Media',        icon: '🎬', route: '/media' },
+    // ── Aggiungi qui le sezioni future ──────────────────────────────────────
+    { label: 'File',         icon: '📁', route: '/files',    soon: true },
     { label: 'Impostazioni', icon: '⚙️', route: '/settings', soon: true },
   ];
 
