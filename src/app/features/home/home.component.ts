@@ -191,7 +191,6 @@ export class HomeComponent {
       description: 'Naviga, apri e modifica i tuoi file sul NAS.',
       route: '/files',
       accent: '#ff6b00',
-      soon: true,
     },
     {
       icon: '⚙️',

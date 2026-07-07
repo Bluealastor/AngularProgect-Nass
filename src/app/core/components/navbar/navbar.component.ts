@@ -162,7 +162,7 @@ export class NavbarComponent {
     { label: 'Home',         icon: '🏠', route: '/home' },
     { label: 'Media',        icon: '🎬', route: '/media' },
     // ── Aggiungi qui le sezioni future ──────────────────────────────────────
-    { label: 'File',         icon: '📁', route: '/files',    soon: true },
+    { label: 'File',         icon: '📁', route: '/files' },
     { label: 'Impostazioni', icon: '⚙️', route: '/settings', soon: true },
   ];
 
