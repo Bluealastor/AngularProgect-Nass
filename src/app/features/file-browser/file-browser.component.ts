@@ -5,6 +5,7 @@ import { HttpEventType } from '@angular/common/http';
 import { FileService, FileItem } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NavStateService } from '../../core/services/nav-state.service';
+import { DialogService } from '../../core/services/dialog.service';
 
 const EXT_360  = ['insv', 'lrv'];
 const EXT_TEXT = [
@@ -28,6 +29,7 @@ export class FileBrowserComponent implements OnInit {
   private router   = inject(Router);
   private route    = inject(ActivatedRoute);
   private navState = inject(NavStateService);
+  private dialog   = inject(DialogService);
 
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
@@ -126,17 +128,19 @@ export class FileBrowserComponent implements OnInit {
     return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + units[i];
   }
 
-  deleteItem(item: FileItem, event: Event): void {
+  async deleteItem(item: FileItem, event: Event): Promise<void> {
     event.stopPropagation(); // evita di aprire il file mentre si clicca elimina
     const tipo = item.fileType === 'DIRECTORY' ? 'cartella' : 'file';
     const msg  = item.fileType === 'DIRECTORY'
       ? `Eliminare la cartella "${item.fileName}" e tutto il suo contenuto?`
       : `Eliminare il file "${item.fileName}"?`;
-    if (!confirm(msg)) return;
+
+    const ok = await this.dialog.confirm(msg, 'Elimina ' + tipo);
+    if (!ok) return;
 
     this.fileSvc.delete(item.fullPath).subscribe({
       next: () => this.loadPath(this.currentPath),
-      error: () => alert(`Errore durante l'eliminazione del ${tipo}.`),
+      error: () => this.dialog.alert(`Errore durante l'eliminazione del ${tipo}.`, 'Errore'),
     });
   }
 
