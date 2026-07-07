@@ -26,7 +26,7 @@ export class LoginComponent {
     this.error   = '';
 
     this.auth.login(this.username, this.password).subscribe({
-      next: () => this.router.navigate(['/files']),
+      next: () => this.router.navigate(['/home']),
       error: (err) => {
         this.loading = false;
         this.error = err.status === 401
