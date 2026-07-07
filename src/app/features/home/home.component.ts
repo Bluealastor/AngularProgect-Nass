@@ -266,6 +266,13 @@ export class HomeComponent {
       accent: '#35c5f4',
     },
     {
+      icon: '🔍',
+      title: 'Prowlarr',
+      description: 'Gestione centralizzata degli indexer.',
+      port: 9696,
+      accent: '#ff6b35',
+    },
+    {
       icon: '⬇️',
       title: 'qBittorrent',
       description: 'Client torrent.',
