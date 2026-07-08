@@ -279,6 +279,13 @@ export class HomeComponent {
       port: 8090,
       accent: '#4caf50',
     },
+    {
+      icon: '🍿',
+      title: 'Jellyseerr',
+      description: 'Richiedi film e serie TV.',
+      port: 5055,
+      accent: '#e91e63',
+    },
   ];
 
   // Costruisce l'URL del servizio usando l'hostname corrente
